@@ -1,0 +1,16 @@
+1. 得到文件的sha-1 哈希值，修改manifest.json文件
+sha1sum fileName
+mac下没有sha1sum命令，那么可以使用csh下采用下面命令：
+set MANIFEST = ../manifest.json
+ echo '{' > $MANIFEST
+ foreach i (*)
+   set sha1 = `openssl sha1 $i | cut -d' ' -f2`
+   echo \'$i\' : \'$sha1\', >> $MANIFEST
+ end
+ echo '}' >> $MANIFEST
+ cp $MANIFEST .
+2. 生成signature
+openssl smime -binary -sign -signer passcert.pem -inkey passkey.pem -passin pass:1234 -in manifest.json -out signature -outform DER
+
+3. 打包
+zip -r example.pkpass ./* -x '*.pem'
